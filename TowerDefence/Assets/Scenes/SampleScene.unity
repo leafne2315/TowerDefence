@@ -12932,9 +12932,10 @@ MonoBehaviour:
   choosingPlayer: {fileID: 0}
   ChooseSlash: {fileID: 0}
   DisplayY: 1.6
+  DisplayY_Ground: 1.4
   FixedValue: 1.5
   FixValue_Ground: 1
-  FixValue_High: 0.5
+  FixValue_High: 0.3
   GunnerPf: {fileID: 1973914385607103955, guid: f50acb46f21a7d040baa88ed5134e87c,
     type: 3}
   AttackerPf: {fileID: 1882452867138901600, guid: b50d8cc3cddee8146a93d52a8048b3da,

@@ -11,6 +11,7 @@ public class CursorController : MonoBehaviour
     private Transform _Selection;
     private Material DefaultMat;
     public float DisplayY;
+    public float DisplayY_Ground;
     public float FixedValue;
     public float FixValue_Ground;
     public float FixValue_High;
@@ -95,7 +96,7 @@ public class CursorController : MonoBehaviour
                 {
                     rayDir = (selection.parent.transform.position-Camera.main.transform.position).normalized;
                     Vector3 MousePosOnDisplay = FixValue_High*(-rayDir)+selection.parent.transform.position;
-                    MousePosOnDisplay.y = DisplayY;
+                    MousePosOnDisplay.y = DisplayY_Ground;
                     transform.position = MousePosOnDisplay;
                 }
                 else
