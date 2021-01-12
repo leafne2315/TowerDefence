@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 257316597040910526}
   - component: {fileID: 257316597039503994}
   - component: {fileID: 257316597038465486}
+  - component: {fileID: 65285652150834096}
   m_Layer: 0
-  m_Name: Fort_Stair_4
+  m_Name: enemy_Stair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,3 +78,16 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &65285652150834096
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257316597040671428}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000027, y: 0.9373259, z: 1.0000019}
+  m_Center: {x: 0.00000047683716, y: -0.4686617, z: 0.0000003874302}
