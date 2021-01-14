@@ -22,6 +22,12 @@ public class CursorController : MonoBehaviour
     public bool isHoldingCharacter;
     public bool ChoosingRanged;
     public bool ChoosingMelee;
+    public enum ManageState {NoWork,SelectDraging,SetDirection,CheckStagePlayer}
+    public ManageState currentState;
+    [Header("RealWorld UI")]
+    public GameObject RealWorldCanvas;
+    public GameObject DirCheckBG;
+    private GameObject currrentDirCheckBG;
     void Start()
     {
         DManager = GameObject.Find("DisplayManager").GetComponent<DisplayManager>();
@@ -30,6 +36,119 @@ public class CursorController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        switch(currentState)
+        {
+            case ManageState.NoWork:                
+            break;
+
+            case ManageState.SelectDraging:
+
+                if(Input.GetMouseButtonUp(0))
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if(Physics.Raycast(ray,out hit))
+                    {
+                        Transform selection = hit.transform;
+
+                        if(selection.CompareTag("Ground")&&ChoosingMelee)
+                        {
+                            HoldCharacter.transform.parent = null;
+                            currentState = ManageState.SetDirection;
+
+                            Vector3 creatPos = HoldCharacter.transform.position;
+                            currrentDirCheckBG = Instantiate(DirCheckBG,creatPos,Quaternion.Euler(90.0f,0.0f,0.0f),RealWorldCanvas.transform);
+                            currrentDirCheckBG.GetComponent<DirectionButtomEvent>().settingCharacter = HoldCharacter;
+                            //HoldCharacter = null;
+                            currentState = ManageState.SetDirection;
+                        }
+                        else if(selection.CompareTag("High")&&ChoosingRanged)
+                        {
+                            HoldCharacter.transform.parent = null;
+                            currentState = ManageState.SetDirection;
+
+                            Vector3 creatPos = HoldCharacter.transform.position;
+                            currrentDirCheckBG = Instantiate(DirCheckBG,creatPos,Quaternion.Euler(90.0f,0.0f,0.0f),RealWorldCanvas.transform);
+                            currrentDirCheckBG.GetComponent<DirectionButtomEvent>().settingCharacter = HoldCharacter;
+                            //HoldCharacter = null;
+                            currentState = ManageState.SetDirection;
+                        }
+                        else
+                        {
+                            Destroy(HoldCharacter);
+                        }
+                    }
+                    StopHolding();
+                    CloseDManger();
+                    
+                }
+
+                if(Input.GetMouseButton(0)&&isHoldingCharacter)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if(Physics.Raycast(ray,out hit))
+                    {
+                        
+                        Transform selection = hit.transform;
+                        Renderer SelectRenderer = selection.GetComponent<Renderer>();
+                        rayDir = (hit.point-Camera.main.transform.position).normalized;
+                        if(SelectRenderer!=null)
+                        {
+                            DefaultMat = SelectRenderer.material;
+                            SelectRenderer.material = hightLightMat;
+                        }
+
+                        _Selection = selection;
+
+                        if(selection.CompareTag("Ground")&&ChoosingMelee)
+                        {
+                            // rayDir = (selection.transform.position-Camera.main.transform.position).normalized;
+                            // Vector3 MousePosOnDisplay = FixValue_Ground*(-rayDir)+selection.transform.position;
+                            // MousePosOnDisplay.y = DisplayY;
+                            // transform.position = MousePosOnDisplay;
+                            //
+                            Vector3 setPos = selection.transform.position;
+                            setPos.y = DisplayY_Ground;
+                            transform.position = setPos;
+                        }
+                        else
+                        if(selection.CompareTag("High")&&ChoosingRanged)
+                        {
+                            rayDir = (selection.parent.transform.position-Camera.main.transform.position).normalized;
+                            Vector3 MousePosOnDisplay = FixValue_High*(-rayDir)+selection.parent.transform.position;
+                            MousePosOnDisplay.y = DisplayY_Ground;
+                            transform.position = MousePosOnDisplay;
+                            //
+                            Vector3 setPos = selection.parent.transform.position;
+                            setPos.y = DisplayY;
+                            transform.position = setPos;
+                        }
+                        else
+                        {
+                            //rayDir = (hit.point-Camera.main.transform.position).normalized;
+                            Vector3 MousePosOnDisplay = hit.point;
+                            MousePosOnDisplay.y = DisplayY;
+                            transform.position = MousePosOnDisplay;
+                        }
+                        
+                        Debug.DrawLine(Camera.main.transform.position,hit.point,Color.red);
+                    }
+                    else
+                    {
+                        Vector3 MousePosOnDisplay = new Vector3(hit.point.x,DisplayY,hit.point.z);
+                        transform.position = MousePosOnDisplay;
+                    }
+                }
+            break;
+
+            case ManageState.SetDirection:
+            break;
+
+            case ManageState.CheckStagePlayer:
+            break;
+        }
 
         if(_Selection!=null)
         {
@@ -37,84 +156,7 @@ public class CursorController : MonoBehaviour
             _SelectRenderer.material = DefaultMat;
             _Selection = null;
         }
-        if(Input.GetMouseButtonUp(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if(Physics.Raycast(ray,out hit))
-            {
-                Transform selection = hit.transform;
-                if(selection.CompareTag("Ground")&&ChoosingMelee)
-                {
-                    HoldCharacter.transform.parent = selection;
-                    HoldCharacter = null;
-                }
-                else
-                if(selection.CompareTag("High")&&ChoosingRanged)
-                {
-                    HoldCharacter.transform.parent = selection.parent;
-                    HoldCharacter = null;
-                }
-                else
-                {
-                    Destroy(HoldCharacter);
-                }
-            }
-            StopHolding();
-            CloseDManger();
-            
-        }
-
-        if(Input.GetMouseButton(0)&&isHoldingCharacter)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if(Physics.Raycast(ray,out hit))
-            {
-                
-                Transform selection = hit.transform;
-                Renderer SelectRenderer = selection.GetComponent<Renderer>();
-                rayDir = (hit.point-Camera.main.transform.position).normalized;
-                if(SelectRenderer!=null)
-                {
-                    DefaultMat = SelectRenderer.material;
-                    SelectRenderer.material = hightLightMat;
-                }
-
-                _Selection = selection;
-
-                if(selection.CompareTag("Ground")&&ChoosingMelee)
-                {
-                    rayDir = (selection.transform.position-Camera.main.transform.position).normalized;
-                    Vector3 MousePosOnDisplay = FixValue_Ground*(-rayDir)+selection.transform.position;
-                    MousePosOnDisplay.y = DisplayY;
-                    transform.position = MousePosOnDisplay;
-                    
-                }
-                else
-                if(selection.CompareTag("High")&&ChoosingRanged)
-                {
-                    rayDir = (selection.parent.transform.position-Camera.main.transform.position).normalized;
-                    Vector3 MousePosOnDisplay = FixValue_High*(-rayDir)+selection.parent.transform.position;
-                    MousePosOnDisplay.y = DisplayY_Ground;
-                    transform.position = MousePosOnDisplay;
-                }
-                else
-                {
-                    rayDir = (hit.point-Camera.main.transform.position).normalized;
-                    Vector3 MousePosOnDisplay = FixedValue*(-rayDir)+hit.point;
-                    MousePosOnDisplay.y = DisplayY;
-                    transform.position = MousePosOnDisplay;
-                }
-                
-                Debug.DrawLine(Camera.main.transform.position,hit.point,Color.red);
-            }
-            else
-            {
-                Vector3 MousePosOnDisplay = new Vector3(hit.point.x,DisplayY,hit.point.z);
-                transform.position = MousePosOnDisplay;
-            }
-        }
+        
     }
     public void ChooseGunner()
     {
@@ -124,6 +166,7 @@ public class CursorController : MonoBehaviour
         HoldCharacter.transform.parent = transform;
         isHoldingCharacter = true;
         ChoosingRanged = true;
+        currentState = ManageState.SelectDraging;
     }
     public void ChooseAttacker()
     {
@@ -133,6 +176,7 @@ public class CursorController : MonoBehaviour
         HoldCharacter.transform.parent = transform;
         isHoldingCharacter = true;
         ChoosingMelee = true;
+        currentState = ManageState.SelectDraging;
     }
     void CloseDManger()
     {
